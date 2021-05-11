@@ -136,7 +136,9 @@ class SiteController extends Controller
         if($model->load(Yii::$app->request->post()) && $model->validate()){
             $user = new User();
             $user->login = $model->login;
+            $user->email = $model->email;
             $user->password = Yii::$app->security->generatePasswordHash($model->password);
+            $user->creation_date = date("Y-m-d");
             if($user->save()){
                 return $this->goHome();
             }
