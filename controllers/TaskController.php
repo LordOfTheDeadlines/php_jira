@@ -4,8 +4,10 @@
 namespace app\controllers;
 
 
+use app\models\Comment;
 use app\models\Task;
 use app\models\TaskForm;
+use phpDocumentor\Reflection\Types\Integer;
 use Yii;
 use yii\data\Pagination;
 use yii\web\Controller;
@@ -31,6 +33,7 @@ class TaskController extends Controller
         return $this->render('index', [
             'tasks' => $tasks,
             'pagination' => $pagination,
+            'view_href'=>Yii::$app->getUrlManager()->createUrl(['post/view', 'id' => 100]),
         ]);
     }
 
@@ -39,12 +42,12 @@ class TaskController extends Controller
      */
     public function actionView($id)
     {
-        $model = Task::findOne($id);
-        if ($model === null) {
+        $task = Task::findOne($id);
+        if ($task === null) {
             throw new NotFoundHttpException;
         }
-
-        return $this->render('view');
+        $comments = Comment::findAll(['task_id'=>$id]);
+        return $this->render('view', ['task' => $task, 'comments'=>$comments]);
     }
 
     public function actionCreate()
@@ -58,7 +61,7 @@ class TaskController extends Controller
             $task->title = $model->title;
             $task->description = $model->description;
             $task->stop_date = $model->deadline;
-            $task->creation_date = date("Y-m-d");
+            $task->creation_date = date("Y-m-d H:i:s");
             $task->status_id = 1;
             $task->author_id = Yii::$app->user->getId();
             $task->executor_id = $model->executor;
@@ -68,5 +71,10 @@ class TaskController extends Controller
             }
         }
         return $this->render('create', compact('model'));
+    }
+
+    public function actionDelete($taskId){
+        $task = Task::findOne($taskId);
+        $task->delete();
     }
 }
