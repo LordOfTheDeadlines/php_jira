@@ -18,7 +18,7 @@ $this->title = 'My Yii Application';
 
         <div class="row">
             <div class="col-lg-4">
-                <a href="task/index"><h2>Show tasks</h2></a>
+                <a href="task/tasks"><h2>Show tasks</h2></a>
                 <p>:3</p>
 
                 <p><a class="btn btn-default" href="http://www.yiiframework.com/doc/">Yii Documentation &raquo;</a></p>
