@@ -5,6 +5,7 @@ namespace app\controllers;
 
 
 use app\models\Comment;
+use app\models\Laborcost;
 use app\models\Status;
 use app\models\Task;
 use app\models\TaskForm;
@@ -17,7 +18,6 @@ use yii\web\NotFoundHttpException;
 
 class TaskController extends Controller
 {
-
     public function actionIndex()
     {
         $query = Task::find();
@@ -48,7 +48,8 @@ class TaskController extends Controller
             throw new NotFoundHttpException;
         }
         $comments = Comment::findAll(['task_id'=>$id]);
-        return $this->render('view', ['task' => $task, 'comments'=>$comments]);
+        $laborcosts = Laborcost::findAll(['task_id'=>$id]);
+        return $this->render('view', ['task' => $task, 'comments'=>$comments, 'laborcosts'=>$laborcosts]);
     }
 
     public function actionCreate()
