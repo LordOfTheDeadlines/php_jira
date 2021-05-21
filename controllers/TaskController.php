@@ -5,8 +5,10 @@ namespace app\controllers;
 
 
 use app\models\Comment;
+use app\models\Status;
 use app\models\Task;
 use app\models\TaskForm;
+use app\models\User;
 use Yii;
 use yii\data\ActiveDataProvider;
 use yii\data\Pagination;
@@ -94,18 +96,37 @@ class TaskController extends Controller
         return $this->render('update', ['model'=>$model]);
     }
 
-    public function actionDelete($taskId){
-        $task = Task::findOne($taskId);
+    public function actionDelete($id){
+        $task = Task::findOne($id);
         $task->delete();
+        return $this->redirect('/task/tasks');
     }
 
     public function actionTasks(){
+        $query = Task::find();
         $dataProvider = new ActiveDataProvider([
-            'query' => Task::find(),
+            'query' => $query,
             'pagination' => [
                 'pageSize' => 20,
             ],
         ]);
+        $query->joinWith(['status']);
+        $dataProvider->sort->attributes['status'] = [
+            'asc' => [Status::tableName().'.name' => SORT_ASC],
+            'desc' => [Status::tableName().'.name' => SORT_DESC],
+        ];
+
+        $query->joinWith(['author']);
+        $dataProvider->sort->attributes['author'] = [
+            'asc' => [User::tableName().'.login' => SORT_ASC],
+            'desc' => [User::tableName().'.login' => SORT_DESC],
+        ];
+
+        $query->joinWith(['executor']);
+        $dataProvider->sort->attributes['executor'] = [
+            'asc' => [User::tableName().'.login' => SORT_ASC],
+            'desc' => [User::tableName().'.login' => SORT_DESC],
+        ];
         return $this->render('tasks', ['dataProvider'=>$dataProvider]);
     }
 }

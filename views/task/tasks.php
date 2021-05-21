@@ -1,29 +1,17 @@
 <?php
 
-use app\models\Status;
-use app\models\User;
 use yii\grid\GridView;
 
 echo GridView::widget([
     'dataProvider' => $dataProvider,
     'columns' => [
+        ['class' => 'yii\grid\SerialColumn'],
         'title',
         'description',
         'creation_date:datetime',
         'stop_date:datetime',
-        [
-            'attribute'=>'status_id',
-            'value' => function($data){
-                return Status::findOne($data)->name;
-            },
-            'format' => 'text',
-        ],
-        [
-            'attribute'=>'author_id',
-            'value' => function($data){
-                return User::findOne($data)->login;
-            },
-            'format' => 'text',
-        ],
+        ['attribute' => 'status','label' => 'Status', 'value'=>'status.name'],
+        ['attribute' => 'author','label' => 'Author', 'value'=>'author.login'],
+        ['attribute' => 'executor','label' => 'Executor', 'value'=>'executor.login'],
         [ 'class' => 'yii\grid\ActionColumn',]]
 ]);
