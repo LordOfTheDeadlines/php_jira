@@ -6,6 +6,7 @@ namespace app\controllers;
 
 use app\models\Comment;
 use app\models\Laborcost;
+use app\models\Observer;
 use app\models\Status;
 use app\models\Task;
 use app\models\TaskForm;
@@ -38,9 +39,6 @@ class TaskController extends Controller
         ]);
     }
 
-    /**
-     * @throws NotFoundHttpException
-     */
     public function actionView($id)
     {
         $task = Task::findOne($id);
@@ -49,7 +47,9 @@ class TaskController extends Controller
         }
         $comments = Comment::findAll(['task_id'=>$id]);
         $laborcosts = Laborcost::findAll(['task_id'=>$id]);
-        return $this->render('view', ['task' => $task, 'comments'=>$comments, 'laborcosts'=>$laborcosts]);
+        $observers = Observer::findAll(['task_id'=>$id]);
+        return $this->render('view', ['task' => $task, 'comments'=>$comments,
+            'laborcosts'=>$laborcosts, 'observers'=>$observers]);
     }
 
     public function actionCreate()
@@ -69,10 +69,20 @@ class TaskController extends Controller
             $task->executor_id = $model->executor;
             $task->timeExpectation = $model->timeExpectation;
             if($task->save()){
+                $this->saveObservers($task->id, $model->observers);
                 return $this->goHome();
             }
         }
         return $this->render('create', compact('model'));
+    }
+
+    public function saveObservers($taskId, $observerIds){
+        foreach ($observerIds as $observerId){
+            $observer = new Observer();
+            $observer->user_id = $observerId;
+            $observer->task_id = $taskId;
+            $observer->save();
+        }
     }
 
     public function actionUpdate($id){
@@ -128,6 +138,7 @@ class TaskController extends Controller
             'asc' => [User::tableName().'.login' => SORT_ASC],
             'desc' => [User::tableName().'.login' => SORT_DESC],
         ];
+
         return $this->render('tasks', ['dataProvider'=>$dataProvider]);
     }
 }

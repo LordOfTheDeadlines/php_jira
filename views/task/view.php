@@ -10,6 +10,11 @@ use yii\helpers\Url;
 <h4><?= Html::encode("time expectation: {$task->timeExpectation}") ?></h4>
 <h4><?= Html::encode("status: ". Status::findOne($task->status_id)->name) ?></h4>
 <p><?= Html::encode("created by " . User::findOne($task->author_id)->login . " in {$task->creation_date}") ?></p>
+<h4>Observers:</h4>
+<?php foreach ($observers as $observer): ?>
+    <li><?= User::findOne($observer->user_id)->login ?></li>
+<?php endforeach; ?>
+
 <h4>Laborcosts</h4>
 <a href=<?= Url::to(['/laborcost/create', 'taskId' => $task->id]); ?>>add laborcost</a>
 <?php foreach ($laborcosts as $laborcost): ?>

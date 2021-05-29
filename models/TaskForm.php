@@ -2,7 +2,6 @@
 
 namespace app\models;
 
-use Yii;
 use yii\base\Model;
 
 
@@ -12,12 +11,13 @@ class TaskForm extends Model
     public $description;
     public $deadline;
     public $executor;
+    public $observers;
     public $timeExpectation;
 
     public function rules()
     {
         return [
-            [['title', 'description', 'deadline','executor', 'timeExpectation'], 'required', 'message' => 'Заполните поле'],
+            [['title', 'description', 'deadline','executor', 'observers', 'timeExpectation'], 'required', 'message' => 'Заполните поле'],
 //            ['deadline', 'format' => 'php:Y-m-d'],
         ];
     }

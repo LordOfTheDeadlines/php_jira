@@ -7,7 +7,6 @@ echo GridView::widget([
     'columns' => [
         ['class' => 'yii\grid\SerialColumn'],
         'title',
-        'description',
         'creation_date:datetime',
         'stop_date:datetime',
         ['attribute' => 'status','label' => 'Status', 'value'=>'status.name'],

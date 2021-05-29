@@ -34,6 +34,11 @@ $this->params['breadcrumbs'][] = $this->title;
         ['prompt'=>'Select executor']
         );?>
 
+        <?= $form->field($model, 'observers')->dropdownList(
+            User::find()->select(['login', 'id'])->indexBy('id')->column(),
+            ['prompt'=>'Select executor','multiple' => 'true']
+        );?>
+
         <?= $form->field($model, 'timeExpectation')->input('text')?>
 
         <?= $form->field($model, 'deadline')->input('text')?>
