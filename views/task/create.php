@@ -5,6 +5,7 @@
 /* @var $form yii\bootstrap\ActiveForm */
 
 use app\models\User;
+use kartik\datetime\DateTimePicker;
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
 
@@ -39,10 +40,16 @@ $this->params['breadcrumbs'][] = $this->title;
             ['prompt'=>'Select executor','multiple' => 'true']
         );?>
 
-        <?= $form->field($model, 'timeExpectation')->input('text')?>
+         <?= $form->field($model, 'timeExpectation')->input('text')?>
 
-        <?= $form->field($model, 'deadline')->input('text')?>
-
+        <?=$form->field($model, 'deadline')->widget(DateTimePicker::classname(), [
+        'options' => ['placeholder' => 'Enter Value'],
+        'pluginOptions' => [
+        'autoclose' => true,
+            'format' => 'yyyy-mm-dd hh:ii:ss',
+        'startDate' => date('yyyy-mm-dd hh:ii:ss')
+        ]
+        ]);?>
         <div class="form-group">
             <div class="col-lg-offset-1 col-lg-11">
                 <?= Html::submitButton('Create Task', ['class' => 'btn btn-primary', 'name' => 'login-button']) ?>
