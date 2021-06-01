@@ -1,16 +1,9 @@
 <?php
 namespace app\controllers;
-use app\models\Comment;
 use app\models\Laborcost;
 use app\models\LaborcostForm;
-use app\models\Status;
-use app\models\Task;
-use app\models\User;
 use Yii;
-use yii\base\BaseObject;
-use yii\data\Pagination;
 use yii\web\Controller;
-use yii\web\NotFoundHttpException;
 
 class LaborcostController extends Controller
 {
@@ -28,7 +21,7 @@ class LaborcostController extends Controller
             $laborcost->user_id = Yii::$app->user->getId();
             $laborcost->task_id = $taskId;
             if($laborcost->save()){
-                return $this->goHome();
+                return $this->redirect('/task/index');
             }
         }
         return $this->render('create', compact('model'));

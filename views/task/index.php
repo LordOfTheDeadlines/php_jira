@@ -1,20 +1,17 @@
+<a href="/task/create"><h4>Create task</h4></a>
 <?php
 
-use app\models\Status;
-use app\models\User;
-use yii\helpers\Html;
-use yii\helpers\Url;
-use yii\widgets\LinkPager;
-?>
-<h1>Tasks</h1>
-<?php foreach ($tasks as $task): ?>
-    <h2><?= "{$task->title}"?></h2>
-    <h4><?= Html::encode("time expectation: {$task->timeExpectation}") ?></h4>
-    <h4><?= Html::encode("status: ". Status::findOne($task->status_id)->name) ?></h4>
-    <p><?= Html::encode("created by " . User::findOne($task->author_id)->login . " in {$task->creation_date}") ?></p>
-    <a href=<?= Url::to(['/task/view', 'id' => $task->id]); ?>>view details</a>
-    <hr/>
-<?php endforeach; ?>
+use yii\grid\GridView;
 
-<?= LinkPager::widget(['pagination' => $pagination]) ?>
-
+echo GridView::widget([
+    'dataProvider' => $dataProvider,
+    'columns' => [
+        ['class' => 'yii\grid\SerialColumn'],
+        'title',
+        'creation_date:datetime',
+        'stop_date:datetime',
+        ['attribute' => 'status','label' => 'Status', 'value'=>'status.name'],
+        ['attribute' => 'author','label' => 'Author', 'value'=>'author.login'],
+        ['attribute' => 'executor','label' => 'Executor', 'value'=>'executor.login'],
+        [ 'class' => 'yii\grid\ActionColumn',]]
+]);

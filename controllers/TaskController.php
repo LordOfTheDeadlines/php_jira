@@ -13,32 +13,16 @@ use app\models\TaskForm;
 use app\models\User;
 use Yii;
 use yii\data\ActiveDataProvider;
-use yii\data\Pagination;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 
 class TaskController extends Controller
 {
-    public function actionIndex()
-    {
-        $query = Task::find();
 
-        $pagination = new Pagination([
-            'defaultPageSize' => 5,
-            'totalCount' => $query->count(),
-        ]);
 
-        $tasks = $query->orderBy('title')
-            ->offset($pagination->offset)
-            ->limit($pagination->limit)
-            ->all();
-
-        return $this->render('index', [
-            'tasks' => $tasks,
-            'pagination' => $pagination,
-        ]);
-    }
-
+    /**
+     * @throws NotFoundHttpException
+     */
     public function actionView($id)
     {
         $task = Task::findOne($id);
@@ -91,29 +75,42 @@ class TaskController extends Controller
         }
         $task = Task::findOne($id);
         $model = new TaskForm();
+        $model->title = $task->title;
+        $model->description = $task->description;
+        $model->deadline = $task->stop_date;
+//        $model->executor = User::findOne('user_id'==$task->executor_id);
+        $model->timeExpectation = $task->timeExpectation;
         if($model->load(Yii::$app->request->post()) && $model->validate()){
             $task->title = $model->title;
             $task->description = $model->description;
             $task->stop_date = $model->deadline;
-//            $task->creation_date = date("Y-m-d H:i:s");
-//            $task->status_id = 1;
-//            $task->author_id = Yii::$app->user->getId();
             $task->executor_id = $model->executor;
             $task->timeExpectation = $model->timeExpectation;
-            if($task->save()){
+            if ($task->save()) {
+                $this->editObservers($task->id, $model->observers);
                 return $this->goHome();
             }
         }
         return $this->render('update', ['model'=>$model]);
     }
 
+    private function editObservers($taskId, $observerIds)
+    {
+        Observer::deleteAll('task_id'==$taskId);
+        foreach ($observerIds as $observerId){
+            $observer = new Observer();
+            $observer->user_id = $observerId;
+            $observer->task_id = $taskId;
+            $observer->save();
+        }
+    }
     public function actionDelete($id){
         $task = Task::findOne($id);
         $task->delete();
-        return $this->redirect('/task/tasks');
+        return $this->redirect('/task/index');
     }
 
-    public function actionTasks(){
+    public function actionIndex(){
         $query = Task::find();
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
@@ -139,6 +136,7 @@ class TaskController extends Controller
             'desc' => [User::tableName().'.login' => SORT_DESC],
         ];
 
-        return $this->render('tasks', ['dataProvider'=>$dataProvider]);
+        return $this->render('index', ['dataProvider'=>$dataProvider]);
     }
+
 }
