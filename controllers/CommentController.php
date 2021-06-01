@@ -24,7 +24,7 @@ class CommentController extends Controller
             $comment->user_id = Yii::$app->user->getId();
             $comment->task_id = $taskId;
             if($comment->save()){
-                return $this->goHome();
+                return $this->redirect('/task/index');
             }
         }
         return $this->render('create', compact('model'));

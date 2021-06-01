@@ -12,34 +12,13 @@ use app\models\Task;
 use app\models\TaskForm;
 use app\models\User;
 use Yii;
-use yii\base\BaseObject;
 use yii\data\ActiveDataProvider;
-use yii\data\Pagination;
-use yii\debug\models\search\Log;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 
 class TaskController extends Controller
 {
-    public function actionIndex()
-    {
-        $query = Task::find();
 
-        $pagination = new Pagination([
-            'defaultPageSize' => 5,
-            'totalCount' => $query->count(),
-        ]);
-
-        $tasks = $query->orderBy('title')
-            ->offset($pagination->offset)
-            ->limit($pagination->limit)
-            ->all();
-
-        return $this->render('index', [
-            'tasks' => $tasks,
-            'pagination' => $pagination,
-        ]);
-    }
 
     /**
      * @throws NotFoundHttpException
@@ -128,10 +107,10 @@ class TaskController extends Controller
     public function actionDelete($id){
         $task = Task::findOne($id);
         $task->delete();
-        return $this->redirect('/task/tasks');
+        return $this->redirect('/task/index');
     }
 
-    public function actionTasks(){
+    public function actionIndex(){
         $query = Task::find();
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
@@ -157,7 +136,7 @@ class TaskController extends Controller
             'desc' => [User::tableName().'.login' => SORT_DESC],
         ];
 
-        return $this->render('tasks', ['dataProvider'=>$dataProvider]);
+        return $this->render('index', ['dataProvider'=>$dataProvider]);
     }
 
 }
