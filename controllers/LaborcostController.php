@@ -10,6 +10,7 @@ class LaborcostController extends Controller
     public function actionCreate($taskId)
     {
         if (Yii::$app->user->isGuest) {
+            Yii::$app->session->setFlash('info', 'Для отметки трудозатрат войдите в систему');
             return $this->goHome();
         }
         $model = new LaborcostForm();
@@ -21,8 +22,10 @@ class LaborcostController extends Controller
             $laborcost->user_id = Yii::$app->user->getId();
             $laborcost->task_id = $taskId;
             if($laborcost->save()){
+                Yii::$app->session->setFlash('success', 'Создано');
                 return $this->redirect('/task/index');
             }
+            Yii::$app->session->setFlash('error', 'Ошибка. Повторите еще раз');
         }
         return $this->render('create', compact('model'));
     }

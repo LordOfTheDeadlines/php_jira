@@ -26,6 +26,10 @@ class TaskForm extends Model
         return [
             'title' => 'Название',
             'description' => 'Пояснение',
+            'deadline' => 'Дедлайн',
+            'executor' => 'Ответственный',
+            'observers' => 'Наблюдатели',
+            'timeExpectation' => 'Трудозатраты'
         ];
     }
 }

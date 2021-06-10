@@ -74,11 +74,13 @@ class SiteController extends Controller
     public function actionLogin()
     {
         if (!Yii::$app->user->isGuest) {
+            Yii::$app->session->setFlash('success', 'Вы уже авторизованы');
             return $this->goHome();
         }
 
         $model = new LoginForm();
         if ($model->load(Yii::$app->request->post()) && $model->login()) {
+            Yii::$app->session->setFlash('success', 'Вы вошли в систему');
             return $this->goBack();
         }
 
@@ -96,7 +98,7 @@ class SiteController extends Controller
     public function actionLogout()
     {
         Yii::$app->user->logout();
-
+        Yii::$app->session->setFlash('success', 'Вы вышли из системы');
         return $this->goHome();
     }
 
@@ -140,6 +142,7 @@ class SiteController extends Controller
             $user->password = Yii::$app->security->generatePasswordHash($model->password);
             $user->creation_date = date("Y-m-d");
             if($user->save()){
+                Yii::$app->session->setFlash('success', 'Вы зарегестрированы');
                 return $this->goHome();
             }
         }

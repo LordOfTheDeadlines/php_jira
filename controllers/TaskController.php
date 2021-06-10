@@ -18,8 +18,6 @@ use yii\web\NotFoundHttpException;
 
 class TaskController extends Controller
 {
-
-
     /**
      * @throws NotFoundHttpException
      */
@@ -27,7 +25,8 @@ class TaskController extends Controller
     {
         $task = Task::findOne($id);
         if ($task === null) {
-            throw new NotFoundHttpException;
+            Yii::$app->session->setFlash('error', 'Ошибка. Такое задание не найдено');
+            return $this->goHome();
         }
         $comments = Comment::findAll(['task_id'=>$id]);
         $laborcosts = Laborcost::findAll(['task_id'=>$id]);
@@ -39,6 +38,7 @@ class TaskController extends Controller
     public function actionCreate()
     {
         if (Yii::$app->user->isGuest) {
+            Yii::$app->session->setFlash('info', 'Для добавления задания войдите в систему');
             return $this->goHome();
         }
         $model = new TaskForm();
@@ -54,8 +54,10 @@ class TaskController extends Controller
             $task->timeExpectation = $model->timeExpectation;
             if($task->save()){
                 $this->saveObservers($task->id, $model->observers);
+                Yii::$app->session->setFlash('success', 'Задание добавлено');
                 return $this->goHome();
             }
+            Yii::$app->session->setFlash('error', 'Ошибка. Повторите еще раз');
         }
         return $this->render('create', compact('model'));
     }
