@@ -39,5 +39,5 @@ $this->params['breadcrumbs'][] = $this->title;
         </div>
 
     <?php ActiveForm::end(); ?>
-    <p>You don't have an account? <a href="/index.php?r=site%2Fsignup">Create it!</a></p>
+    <p>You don't have an account? <a href="/site/signup">Create it!</a></p>
 </div>

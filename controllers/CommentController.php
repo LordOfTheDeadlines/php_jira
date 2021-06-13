@@ -14,6 +14,7 @@ class CommentController extends Controller
     public function actionCreate($taskId)
     {
         if (Yii::$app->user->isGuest) {
+            Yii::$app->session->setFlash('info', 'Для добавления комментария войдите в систему');
             return $this->goHome();
         }
         $model = new ComForm();
@@ -24,8 +25,10 @@ class CommentController extends Controller
             $comment->user_id = Yii::$app->user->getId();
             $comment->task_id = $taskId;
             if($comment->save()){
+                Yii::$app->session->setFlash('success', 'Комментарий добавлен');
                 return $this->redirect('/task/index');
             }
+            Yii::$app->session->setFlash('error', 'Ошибка. Повторите еще раз');
         }
         return $this->render('create', compact('model'));
     }

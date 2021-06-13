@@ -10,6 +10,7 @@ use app\models\Observer;
 use app\models\Status;
 use app\models\Task;
 use app\models\TaskForm;
+use app\models\TaskSearchModel;
 use app\models\User;
 use Yii;
 use yii\data\ActiveDataProvider;
@@ -18,8 +19,6 @@ use yii\web\NotFoundHttpException;
 
 class TaskController extends Controller
 {
-
-
     /**
      * @throws NotFoundHttpException
      */
@@ -27,7 +26,8 @@ class TaskController extends Controller
     {
         $task = Task::findOne($id);
         if ($task === null) {
-            throw new NotFoundHttpException;
+            Yii::$app->session->setFlash('error', 'Ошибка. Такое задание не найдено');
+            return $this->goHome();
         }
         $comments = Comment::findAll(['task_id'=>$id]);
         $laborcosts = Laborcost::findAll(['task_id'=>$id]);
@@ -39,6 +39,7 @@ class TaskController extends Controller
     public function actionCreate()
     {
         if (Yii::$app->user->isGuest) {
+            Yii::$app->session->setFlash('info', 'Для добавления задания войдите в систему');
             return $this->goHome();
         }
         $model = new TaskForm();
@@ -54,8 +55,10 @@ class TaskController extends Controller
             $task->timeExpectation = $model->timeExpectation;
             if($task->save()){
                 $this->saveObservers($task->id, $model->observers);
+                Yii::$app->session->setFlash('success', 'Задание добавлено');
                 return $this->goHome();
             }
+            Yii::$app->session->setFlash('error', 'Ошибка. Повторите еще раз');
         }
         return $this->render('create', compact('model'));
     }
@@ -111,6 +114,7 @@ class TaskController extends Controller
     }
 
     public function actionIndex(){
+        $searchModel = new TaskSearchModel();
         $query = Task::find();
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
@@ -118,6 +122,7 @@ class TaskController extends Controller
                 'pageSize' => 20,
             ],
         ]);
+        $searchModel->load(\Yii::$app->request->getQueryParams());
         $query->joinWith(['status']);
         $dataProvider->sort->attributes['status'] = [
             'asc' => [Status::tableName().'.name' => SORT_ASC],
@@ -136,7 +141,13 @@ class TaskController extends Controller
             'desc' => [User::tableName().'.login' => SORT_DESC],
         ];
 
-        return $this->render('index', ['dataProvider'=>$dataProvider]);
+        $query->andWhere('executor_id in (select id from user where login like "%'.$searchModel->executor.'%")');
+        $query->andWhere('author_id in (select id from user where login like "%'.$searchModel->author.'%")');
+        $query->andWhere('title LIKE "%' . $searchModel->title . '%" ');
+        $query->andWhere('status_id LIKE "%' . $searchModel->status . '%" ');
+        $query->andWhere('task.creation_date LIKE "%' . $searchModel->creation_date . '%" ');
+        $query->andWhere('task.stop_date LIKE "%' . $searchModel->stop_date . '%" ');
+        return $this->render('index', ['dataProvider'=>$dataProvider, 'searchModel' => $searchModel]);
     }
 
 }
