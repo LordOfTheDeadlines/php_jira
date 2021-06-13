@@ -10,6 +10,7 @@ use app\models\Observer;
 use app\models\Status;
 use app\models\Task;
 use app\models\TaskForm;
+use app\models\TaskSearchModel;
 use app\models\User;
 use Yii;
 use yii\data\ActiveDataProvider;
@@ -113,6 +114,7 @@ class TaskController extends Controller
     }
 
     public function actionIndex(){
+        $searchModel = new TaskSearchModel();
         $query = Task::find();
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
@@ -120,6 +122,7 @@ class TaskController extends Controller
                 'pageSize' => 20,
             ],
         ]);
+        $searchModel->load(\Yii::$app->request->getQueryParams());
         $query->joinWith(['status']);
         $dataProvider->sort->attributes['status'] = [
             'asc' => [Status::tableName().'.name' => SORT_ASC],
@@ -138,7 +141,13 @@ class TaskController extends Controller
             'desc' => [User::tableName().'.login' => SORT_DESC],
         ];
 
-        return $this->render('index', ['dataProvider'=>$dataProvider]);
+        $query->andWhere('executor_id in (select id from user where login like "%'.$searchModel->executor.'%")');
+        $query->andWhere('author_id in (select id from user where login like "%'.$searchModel->author.'%")');
+        $query->andWhere('title LIKE "%' . $searchModel->title . '%" ');
+        $query->andWhere('status_id LIKE "%' . $searchModel->status . '%" ');
+        $query->andWhere('task.creation_date LIKE "%' . $searchModel->creation_date . '%" ');
+        $query->andWhere('task.stop_date LIKE "%' . $searchModel->stop_date . '%" ');
+        return $this->render('index', ['dataProvider'=>$dataProvider, 'searchModel' => $searchModel]);
     }
 
 }

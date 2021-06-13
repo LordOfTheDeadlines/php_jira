@@ -19,4 +19,16 @@ class Task extends ActiveRecord
     {
         return $this->hasOne(User::className(), ['id' => 'executor_id']);
     }
+    /* Геттер для полного имени человека */
+    public function getTitle() {
+        return $this->title;
+    }
+
+    /* Название атрибута для вывода на экран */
+    public function attributeLabels() {
+        return [
+            /* Другие атрибуты */
+            'title' => 'Title'
+        ];
+    }
 }
